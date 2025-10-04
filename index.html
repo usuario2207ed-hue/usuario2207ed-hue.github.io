@@ -1,4 +1,4 @@
-<!doctype html>  
+<!doctype html>   
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -62,23 +62,42 @@
   #finalScreen img { max-width:200px; display:block; margin:0 auto 20px; }
   #finalScreen h2 { font-size:2em; }
 
-  /* Banner in-page fixado abaixo do rodapé */
+  /* Banner in-page fixado abaixo do rodapé (ajustado 20% da tela) */
   #adBanner {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
+    height: 20vh; /* 20% da altura da tela */
+    max-height: 120px; /* limita a altura máxima */
     text-align: center;
     z-index: 9;
     background: #000;
-    padding: 2px 0; /* altura reduzida em 60% */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+
   #adBanner ins.adsbygoogle {
     display: block;
     margin: 0 auto;
-    max-height: 40px; /* limita altura */
+    max-height: 100%;
+    height: auto !important;
     overflow: hidden;
   }
+
+  /* Ajuste responsivo para telas pequenas */
+  @media screen and (max-width: 480px) {
+    #adBanner {
+      height: 20vh;
+      max-height: 60px;
+    }
+    #adBanner ins.adsbygoogle {
+      max-height: 100%;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -132,13 +151,11 @@ function newMosquito(){
   const types=["zigzag","horizontal","vertical"];
   const type=types[Math.floor(Math.random()*types.length)];
   
-  // Nasce próximo ao centro da tela
   const startX = W/2 + (Math.random()*100 - 50); 
   const startY = H/2 + (Math.random()*100 - 50);
 
-  // Vetor de movimento inicial apontando para fora (extremidades)
   const angle = Math.random() * Math.PI * 2;
-  const speed = 80 + Math.random()*100;
+  const speed = 30 + Math.random()*40;
   const vx = Math.cos(angle) * speed;
   const vy = Math.sin(angle) * speed;
 
@@ -189,12 +206,10 @@ mosquitoes.forEach((m)=>{
       document.getElementById("score").textContent="Pontos: "+score;
       if(score%10===0){ const frase=frases[Math.floor(Math.random()*frases.length)]; mostrarMensagem(frase); }
 
-      // Ao nascer, direciona aleatoriamente para extremidades
       const angle = Math.random() * Math.PI * 2;
-      const speed = 80 + Math.random()*200;
+      const speed = 60 + Math.random()*80;
       m.vx = Math.cos(angle) * speed;
       m.vy = Math.sin(angle) * speed;
-      // Posiciona próximo ao centro novamente
       m.x = W/2 + (Math.random()*100 - 50);
       m.y = H/2 + (Math.random()*100 - 50);
     }
