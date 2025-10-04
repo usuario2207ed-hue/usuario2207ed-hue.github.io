@@ -70,9 +70,17 @@
     width: 100%;
     text-align: center;
     z-index: 9;
-    background: #000; /* evita transparência do canvas atrás */
-    padding: 2px 0;   /* altura reduzida em 60% */
+    background: #000;
+    padding: 2px 0; /* altura reduzida em 60% */
 }
+
+#adBanner ins.adsbygoogle {
+    display: block;
+    margin: 0 auto;
+    max-height: 40px; /* limita altura */
+    overflow: hidden;
+}
+
 </style>
 </head>
 <body>
@@ -181,4 +189,5 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
