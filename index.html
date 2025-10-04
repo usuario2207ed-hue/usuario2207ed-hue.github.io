@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html>  
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -63,7 +63,7 @@
   #finalScreen h2 { font-size:2em; }
 
   /* Banner in-page fixado abaixo do rodapé */
-#adBanner {
+  #adBanner {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -72,15 +72,13 @@
     z-index: 9;
     background: #000;
     padding: 2px 0; /* altura reduzida em 60% */
-}
-
-#adBanner ins.adsbygoogle {
+  }
+  #adBanner ins.adsbygoogle {
     display: block;
     margin: 0 auto;
     max-height: 40px; /* limita altura */
     overflow: hidden;
-}
-
+  }
 </style>
 </head>
 <body>
@@ -133,8 +131,20 @@ updateRankingDisplay();
 function newMosquito(){
   const types=["zigzag","horizontal","vertical"];
   const type=types[Math.floor(Math.random()*types.length)];
-  return { x:Math.random()*W, y:Math.random()*H, vx:(Math.random()*2-1)*100, vy:(Math.random()*2-1)*100, scale:1.5, alive:true, wiggle:Math.random()*10, type:type, t:0 };
+  
+  // Nasce próximo ao centro da tela
+  const startX = W/2 + (Math.random()*100 - 50); 
+  const startY = H/2 + (Math.random()*100 - 50);
+
+  // Vetor de movimento inicial apontando para fora (extremidades)
+  const angle = Math.random() * Math.PI * 2;
+  const speed = 80 + Math.random()*100;
+  const vx = Math.cos(angle) * speed;
+  const vy = Math.sin(angle) * speed;
+
+  return { x:startX, y:startY, vx:vx, vy:vy, scale:1.5, alive:true, wiggle:Math.random()*10, type:type, t:0 };
 }
+
 function drawMosquito(ctx,x,y,scale){ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
 ctx.beginPath();ctx.ellipse(0,0,6,18,0,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
 ctx.beginPath();ctx.ellipse(-6,-6,18,10,-0.6,0,Math.PI*2);ctx.fillStyle='rgba(200,200,255,0.75)';ctx.fill();
@@ -154,9 +164,9 @@ function checkSpawn(){while(mosquitoes.length<requiredMosquitoes()){mosquitoes.p
 
 function update(dt){if(!running) return;updateBuzzFrequency();
 mosquitoes.forEach(m=>{if(m.alive){m.t+=dt*2;
-  if(m.type==="zigzag"){ m.x+=Math.cos(m.t*3)*50*dt + m.vx*dt; m.y+=Math.sin(m.t*5)*40*dt + m.vy*dt; }
-  else if(m.type==="horizontal"){ m.x+=Math.cos(m.t*2)*120*dt; m.y+=Math.sin(m.t*0.5)*20*dt; }
-  else if(m.type==="vertical"){ m.y+=Math.sin(m.t*3)*120*dt; m.x+=Math.cos(m.t*0.5)*20*dt; }
+  if(m.type==="zigzag"){ m.x+=Math.cos(m.t*3)*120*dt + m.vx*dt; m.y+=Math.sin(m.t*5)*110*dt + m.vy*dt; }
+  else if(m.type==="horizontal"){ m.x+=Math.cos(m.t*2)*120*dt + m.vx*dt*0.2; m.y+=Math.sin(m.t*0.5)*20*dt; }
+  else if(m.type==="vertical"){ m.y+=Math.sin(m.t*3)*120*dt + m.vy*dt*0.2; m.x+=Math.cos(m.t*0.5)*20*dt; }
   if(m.x<-40)m.x=W+40;if(m.x>W+40)m.x=-40;if(m.y<-40)m.y=H+40;if(m.y>H+40)m.y=-40; }});
 for(let s of splats){s.t+=dt;for(let d of s.droplets)d.life-=dt*0.9;}for(let i=splats.length-1;i>=0;i--){if(splats[i].t>2.2)splats.splice(i,1);}checkSpawn();
 if(score>=1000){running=false;document.getElementById("finalMsg").textContent=`Matador de Pernilongo do Gamer ${playerName}!`;document.getElementById("finalScreen").style.display="block";}}
@@ -167,12 +177,39 @@ let last=performance.now();
 function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;update(dt);render();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
 
-canvas.addEventListener('pointerdown',(e)=>{if(!running) return;const rect=canvas.getBoundingClientRect();const x=e.clientX-rect.left;const y=e.clientY-rect.top;
-mosquitoes.forEach((m)=>{if(m.alive){const dx=x-m.x,dy=y-m.y;if((dx*dx/400+dy*dy/676)<=1){createSplat(m.x,m.y);playHitSound();m.x=Math.random()*W;m.y=Math.random()*H;score++;document.getElementById("score").textContent="Pontos: "+score;if(score%10===0){const frase=frases[Math.floor(Math.random()*frases.length)];mostrarMensagem(frase);}}}});});
+// Ajuste: novo vetor aleatório ao nascer
+canvas.addEventListener('pointerdown',(e)=>{
+if(!running) return;
+const rect=canvas.getBoundingClientRect(); const x=e.clientX-rect.left; const y=e.clientY-rect.top;
+mosquitoes.forEach((m)=>{
+  if(m.alive){
+    const dx=x-m.x,dy=y-m.y;
+    if((dx*dx/400+dy*dy/676)<=1){
+      createSplat(m.x,m.y); playHitSound(); score++;
+      document.getElementById("score").textContent="Pontos: "+score;
+      if(score%10===0){ const frase=frases[Math.floor(Math.random()*frases.length)]; mostrarMensagem(frase); }
+
+      // Ao nascer, direciona aleatoriamente para extremidades
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 80 + Math.random()*200;
+      m.vx = Math.cos(angle) * speed;
+      m.vy = Math.sin(angle) * speed;
+      // Posiciona próximo ao centro novamente
+      m.x = W/2 + (Math.random()*100 - 50);
+      m.y = H/2 + (Math.random()*100 - 50);
+    }
+  }
+});
+});
 
 document.getElementById('reset').addEventListener('click',()=>{if(running){addScore(playerName,score);score=0;document.getElementById("score").textContent="Pontos: 0";mosquitoes=[];checkSpawn();}});
 document.getElementById('mute').addEventListener('click',()=>{mute=!mute;});
-document.getElementById('startBtn').addEventListener('click',()=>{playerName=prompt("Digite seu nome:")||"Anônimo";initAudio();running=true;score=0;document.getElementById("score").textContent="Pontos: 0";mosquitoes=[];checkSpawn();document.getElementById('startBtn').style.display="none";document.getElementById('controls').style.display="flex";});
+document.getElementById('startBtn').addEventListener('click',()=>{
+playerName=prompt("Digite seu nome:")||"Anônimo";
+initAudio(); running=true; score=0;
+document.getElementById("score").textContent="Pontos: 0"; mosquitoes=[]; checkSpawn();
+document.getElementById('startBtn').style.display="none"; document.getElementById('controls').style.display="flex";
+});
 </script>
 
 <!-- Service Worker -->
@@ -189,5 +226,3 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
-
