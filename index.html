@@ -155,7 +155,7 @@ function newMosquito(){
   const startY = H/2 + (Math.random()*100 - 50);
 
   const angle = Math.random() * Math.PI * 2;
-  const speed = 30 + Math.random()*40;
+  const speed = 30 + Math.random()*100;
   const vx = Math.cos(angle) * speed;
   const vy = Math.sin(angle) * speed;
 
@@ -207,7 +207,7 @@ mosquitoes.forEach((m)=>{
       if(score%10===0){ const frase=frases[Math.floor(Math.random()*frases.length)]; mostrarMensagem(frase); }
 
       const angle = Math.random() * Math.PI * 2;
-      const speed = 60 + Math.random()*80;
+      const speed = 100 + Math.random()*400;
       m.vx = Math.cos(angle) * speed;
       m.vy = Math.sin(angle) * speed;
       m.x = W/2 + (Math.random()*100 - 50);
